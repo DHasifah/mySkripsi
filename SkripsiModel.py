@@ -3,7 +3,7 @@ import psycopg2 as pg
 class SkripsiModel:
     TABLE   = 'kuliner'
     KEY     = 'id'
-    COLUMNS = ['konten', 'preprocessing', 'bobot', 'kategori','tanggal, filtering']
+    COLUMNS = ['konten', 'preprocessing', 'kategori','tanggal', 'filtering', 'bobot']
     TYPES   = ['%s','%s','%s','%s','%s', '%s']
 
     def __init__(self):
@@ -16,12 +16,12 @@ class SkripsiModel:
         self.cur.execute('select * from '+self.TABLE)
         return self.cur.fetchall()
 
-    def insert(self, konten, preprocessing, bobot, kategori, tanggal, filtering):
+    def insert(self, konten, preprocessing, kategori, tanggal, filtering, bobot):
         col = ', '.join(self.COLUMNS)
      #    print('insert into '+self.TABLE+' ('+col+') values ('+self.types+')')
      #    print(','.join(data))
         try:
-            self.cur.execute('insert into '+self.TABLE+' ('+col+') values ('+self.types+')',(konten, preprocessing, bobot, kategori, tanggal, filtering))
+            self.cur.execute('insert into '+self.TABLE+' ('+col+') values ('+self.types+')',(konten, preprocessing, kategori, tanggal, filtering, bobot))
         except Exception as e:
             print(e)
 
@@ -34,4 +34,10 @@ class SkripsiModel:
 
     def fil(self, data, id):
         self.cur.execute('update '+self.TABLE+' set filtering=\''+data+'\' where '+self.KEY+'='+str(id))
- 
+
+    def getData(self):
+        self.cur.execute('select filtering from '+self.TABLE)
+        return self.cur.fetchall()
+    
+    def itdits(self, data,id):
+        self.cur.execute('update '+self.TABLE+' set bobot=\''+data+'\' where '+self.KEY+'='+str)
