@@ -9,12 +9,12 @@ import math
 
 
 crawler = Crawling()
-model = SkripsiModel()
+database = SkripsiModel()
 
 #crawling data
 # data = crawler.run('\ ','id',5000)
 # for tweet in data:
-# 	model.insert(str(tweet.text), '', '{}',0,str(tweet.created_at),'')
+# 	database.insert(str(tweet.text), '', '{}',0,str(tweet.created_at),'')
 
 factory = StemmerFactory()
 stemmer = factory.create_stemmer()
@@ -29,23 +29,23 @@ dictionary = ArrayDictionary(katahubung)
 str = StopWordRemover(dictionary)
 
 #cleaning data mentah di preprocessing
-for data in model.getAll():
+for data in database.getAll():
 	removeRT = re.compile('RT').sub('', data[1], count=1).lower()
 	#hapus tanda baca, url, akun, emoticon, hastag
 	clean = ' '.join(re.sub("([@#][^\s]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)|(\d+)"," ",removeRT).split(' '))
 	# print((clean).split())
-	# model.update(clean,data[0])
+	# database.update(clean,data[0])
 
-#stemming dan stopword data yg telah di lower dan split karena tdak ada kata hubung yg terlewat karena huruf kapital 
-for data in model.getTweet():
+#stemming dan stopword data yg telah di lower karena ada kata hubung  huruf kapital 
+for data in database.getTweet():
 	removeRT = re.compile('RT').sub('', data[1], count=1)
 	hubung = str.remove(removeRT)
 	alldata = stemmer.stem(hubung)
 	# print((alldata).split())
-	# model.fil(alldata, data[0])
+	# database.fil(alldata, data[0])
 
 #pembobotan kata itd its
-for data in model.getData():
+for data in database.getData():
 	current_texts = data[0].split(' ')
 	doc_info = get_doc(current_texts)
 	frequency = create_frequency(current_texts)
@@ -56,5 +56,5 @@ for data in model.getData():
 	# print(ITD_score)
 	# print(ITS_score)
 	print(ITDITS_scores)
-	# model.itdits(ITDITS_scores,data)
+	# database.itdits(ITDITS_scores,data)
 	# print(data[0])
