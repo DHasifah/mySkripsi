@@ -16,3 +16,5 @@ class Crawling:
 
 	def run(self, query, lang, limit):
 		return tweepy.Cursor(self.api.search, q=query, lang=lang).items(limit)
+
+

@@ -1,9 +1,10 @@
 import psycopg2 as pg
+import json
 
 class SkripsiModel:
     TABLE   = 'kuliner'
     KEY     = 'id'
-    COLUMNS = ['konten', 'preprocessing', 'kategori','tanggal', 'filtering', 'bobot']
+    COLUMNS = ['konten', 'preprocessing','tanggal', 'filtering', 'bobot', 'kategori']
     TYPES   = ['%s','%s','%s','%s','%s', '%s']
 
     def __init__(self):
@@ -16,28 +17,29 @@ class SkripsiModel:
         self.cur.execute('select * from '+self.TABLE)
         return self.cur.fetchall()
 
-    def insert(self, konten, preprocessing, kategori, tanggal, filtering, bobot):
+    def insert(self, konten, preprocessing, tanggal, filtering, bobot, kategori):
         col = ', '.join(self.COLUMNS)
-     #    print('insert into '+self.TABLE+' ('+col+') values ('+self.types+')')
-     #    print(','.join(data))
         try:
-            self.cur.execute('insert into '+self.TABLE+' ('+col+') values ('+self.types+')',(konten, preprocessing, kategori, tanggal, filtering, bobot))
+            self.cur.execute('insert into '+self.TABLE+' ('+col+') values ('+self.types+')',(konten, preprocessing, tanggal, filtering, bobot, kategori))
         except Exception as e:
             print(e)
 
     def update(self, data, id):
         self.cur.execute('update '+self.TABLE+' set preprocessing=\''+data+'\' where '+self.KEY+'='+str(id))
  
-    def getTweet(self):
-        self.cur.execute('select id, preprocessing from '+self.TABLE)
-        return self.cur.fetchall()
-
     def fil(self, data, id):
         self.cur.execute('update '+self.TABLE+' set filtering=\''+data+'\' where '+self.KEY+'='+str(id))
 
     def getData(self):
-        self.cur.execute('select filtering from '+self.TABLE)
+        self.cur.execute('select id, preprocessing, filtering,bobot,kategori from '+self.TABLE)
         return self.cur.fetchall()
     
-    def itdits(self, data,id):
-        self.cur.execute('update '+self.TABLE+' set bobot=\''+data+'\' where '+self.KEY+'='+str)
+    def itdits(self, data, id):
+        self.cur.execute('update '+self.TABLE+' set bobot=\''+json.dumps(data)+'\' where '+self.KEY+'='+str(id))
+
+    def jumlahDoc(self):
+        self.cur.execute('select kategori, count(id) from kuliner group by kategori')
+        return self.cur.fetchall()
+
+    def kategori_awal(self,data,id):
+        self.cur.execute('update '+self.TABLE+' set kategori=\''+json.dumps(data)+'\' where '+self.KEY+'='+str(id))
