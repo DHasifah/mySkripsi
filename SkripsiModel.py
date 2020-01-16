@@ -4,8 +4,8 @@ import json
 class SkripsiModel:
     TABLE   = 'kuliner'
     KEY     = 'id'
-    COLUMNS = ['konten', 'preprocessing','tanggal', 'filtering', 'bobot', 'kategori']
-    TYPES   = ['%s','%s','%s','%s','%s', '%s']
+    COLUMNS = ['konten', 'preprocessing','tanggal', 'filtering', 'bobot', 'kategori','status']
+    TYPES   = ['%s','%s','%s','%s','%s', '%s','%s']
 
     def __init__(self):
         self.conn   = pg.connect('user=postgres password=051997 dbname=skripsi')
@@ -17,10 +17,10 @@ class SkripsiModel:
         self.cur.execute('select * from '+self.TABLE)
         return self.cur.fetchall()
 
-    def insert(self, konten, preprocessing, tanggal, filtering, bobot, kategori):
+    def insert(self, konten, preprocessing, tanggal, filtering, bobot, kategori, status):
         col = ', '.join(self.COLUMNS)
         try:
-            self.cur.execute('insert into '+self.TABLE+' ('+col+') values ('+self.types+')',(konten, preprocessing, tanggal, filtering, bobot, kategori))
+            self.cur.execute('insert into '+self.TABLE+' ('+col+') values ('+self.types+')',(konten, preprocessing, tanggal, filtering, bobot, kategori, status))
         except Exception as e:
             print(e)
 
@@ -31,7 +31,27 @@ class SkripsiModel:
         self.cur.execute('update '+self.TABLE+' set filtering=\''+data+'\' where '+self.KEY+'='+str(id))
 
     def getData(self):
-        self.cur.execute('select id, preprocessing, filtering,bobot,kategori from '+self.TABLE)
+        self.cur.execute('select id, preprocessing, filtering,bobot,kategori from '+self.TABLE+' where status = true')
+        return self.cur.fetchall()
+
+    def getDataTesting(self):
+        self.cur.execute('select id, preprocessing, filtering,bobot,kategori from '+self.TABLE+' where status = false')
+        return self.cur.fetchall()
+
+    # def getDataTrain(self):
+    #     self.cur.execute('select id, preprocessing, filtering,bobot,kategori from '+self.TABLE)
+    #     return self.cur.fetchall()
+
+    def testing(self,id):
+        self.cur.execute('select id, preprocessing, filtering,bobot,kategori from '+self.TABLE+' where id ='+str(id))
+        return self.cur.fetchall()
+
+    def test(self):
+        self.cur.execute('select id, preprocessing, filtering,bobot,kategori from '+self.TABLE+' where status = false')
+        return self.cur.fetchall()
+
+    def getDataByCategory(self,category):
+        self.cur.execute('select id, preprocessing, filtering,bobot,kategori from '+self.TABLE+' where kategori=\''+json.dumps(category)+'\' and status = true')
         return self.cur.fetchall()
     
     def itdits(self, data, id):

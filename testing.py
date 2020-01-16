@@ -1,10 +1,12 @@
 import numpy as np
+from testingModel import TestingModel
 from SkripsiModel import SkripsiModel
 from db2 import Term
 from ITDITSModel import create_frequency, computeITD, computeITS, computeITDITS
 
 database_kuliner = SkripsiModel()
 database2 = Term()
+database_testing = TestingModel()
 
 # J_0	: soto
 # J_1	: gudeg
@@ -20,22 +22,22 @@ database2 = Term()
 #total dokumen
 x = database_kuliner.getData()
 D=len(x)
-print({'total dokumen ': D})
+# print({'total dokumen ': D})
 
 #bobot kelas (prior probability)
 Dj = database_kuliner.jumlahDoc()
 term=[]
 kelas={}
 dataKelas = {}
-
 for key,value in Dj:
 	term.append(key)
 	bobot_kelas=value/D
 	kelas[key]=bobot_kelas
 	# print(value)
-	print({'kelas ': key, 'bobot kelas ': bobot_kelas})
+	# print({'kelas ': key, 'bobot kelas ': bobot_kelas})
 	dtk = database_kuliner.getDataByCategory(key)
 	dataKelas[key] = dtk
+
 
 #jumlah dokumen kelas tersebut
 # for Dj in database_kuliner.jumlahDoc():
@@ -67,31 +69,9 @@ Nj=len(y)
 # print({'total term ': Nj})
 
 #bobot kata (conditional probability)
-benar = 0
-jml_data = 0
-for data in database_kuliner.getData():
-	term=[]
-	jml_data = jml_data+1
-	skor={}
-	docLn = count_words(data[2])
-	# print(docLn)
-	# hasil_perkalian = 1
-	for key,value in data[3].items():
-		term.append(key)
-		# print(value)
-		bobot_kata=(int(value)+1)/(docLn+Nj)
-		skor[key]=bobot_kata
-		database_kuliner.itdits(skor,data[0])
-
-
-print('sukses input data bobot')
-
 ada = False
-benar = 0;
-jml_data = 0;
-for data in database_kuliner.getData():
+for data in database_testing.test():
 	ada = True
-	jml_data = jml_data +1
 	filtering = data[2].split()
 	tertinggi = 0
 	kls = ''
@@ -107,16 +87,34 @@ for data in database_kuliner.getData():
 		if hasilPerkalian>tertinggi:
 			tertinggi = hasilPerkalian
 			kls = key
-	if data[4] == kls:
-		benar = benar+1
-	# print(tertinggi)
+	print(tertinggi)
 	print(kls)
 			# for k,val in value.list():
 			# 	print(val)
 			# 	die()
 		
-akurasi = (benar/jml_data)*100	
-print({'akurasi' :akurasi})
+
 
 if not ada:
 	print("Tidak ada")
+	# hasil_perkalian = hasil_perkalian*bobot_kata
+		# print(hasil_perkalian)
+	# print(skor)
+
+#pengujian Naive Bayes
+# 	tertinggi = 0
+# 	kls = 0
+# 	for key,value in kelas.items():
+# 		# print(key)
+# 		tot = float(value)*hasil_perkalian
+# 		if tot > tertinggi:
+# 			tertinggi = tot
+# 			kls = key
+# 	# print(kls)
+# 	# print(data[4])
+# 	if str(kls) == str(data[4]):
+# 		benar = benar +1
+
+# # print(benar)
+# akurasi = (benar/jml_data)*100	
+# print(akurasi)

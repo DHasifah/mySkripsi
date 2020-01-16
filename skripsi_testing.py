@@ -1,4 +1,5 @@
 from SkripsiModel import SkripsiModel
+from testingModel import TestingModel
 from crawling import Crawling
 from db2 import Term
 import string
@@ -11,11 +12,12 @@ import math
 crawler = Crawling()
 database = SkripsiModel()
 database2 = Term()
+db_testing = TestingModel()
 
 # # crawling data
-data = crawler.run('pempek','id',3)
-for tweet in data:
-	database.insert(str(tweet.text), '',str(tweet.created_at),'','[]','[]','true')
+# data = crawler.run('pempek','id',2)
+# for tweet in data:
+# 	db_testing.insert(str(tweet.text),'',str(tweet.created_at), '','[]','[]')
 # 	print(tweet.text)
 
 factory = StemmerFactory()
@@ -37,24 +39,24 @@ dictionary = ArrayDictionary(katahubung)
 str = StopWordRemover(dictionary)
 
 #cleaning data crawling
-for data in database.getAll():
-	removeRT = re.compile('RT').sub('', data[1], count=1).lower()
+for data in db_testing.getAll():
+	removeRT = re.compile('RT').sub('',data[1], count=1).lower()
 	#hapus tanda baca, url, informasi akun, emoticon, hastag
 	clean = ' '.join(re.sub("([@#][^\s]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)|(\d+)"," ",removeRT).split(' '))
 	# print(clean.split())
-	database.update(clean,data[0])
+	db_testing.update(clean,data[0])
 
 #stemming dan stopword data yg telah dilower 
-for data in database.getData():
+for data in db_testing.getDataTesting():
 	hubung = str.remove(data[1])
 	alldata = stemmer.stem(hubung)
 	# print(alldata.split())
-	database.fil(alldata, data[0])
+	db_testing.fil(alldata, data[0])
 
 
 #single term pada tabel term
 single_word=[]
-for data in database.getData():
+for data in db_testing.getDataTesting():
 	x=data[2].split()
 	x=list(set(x))
 	for kata in x:
@@ -64,14 +66,14 @@ for data in database.getData():
 # print(single_word)
 
 #pembobotan kata itd its
-for data in database.getData():
-	current_texts = data[2].split(' ')
-	frequency = create_frequency(current_texts)
+# for data in database.getData():
+# 	current_texts = data[2].split(' ')
+# 	frequency = create_frequency(current_texts)
 
-	ITD_score = computeITD(frequency)
-	ITS_score = computeITS(frequency)
-	ITDITS_scores = computeITDITS(ITD_score, ITS_score,frequency)
-	# print(ITD_score)
-	# print(ITS_score)
-	# print(ITDITS_scores)
-	database.itdits(ITDITS_scores, data[0])
+# 	ITD_score = computeITD(frequency)
+# 	ITS_score = computeITS(frequency)
+# 	ITDITS_scores = computeITDITS(ITD_score, ITS_score,frequency)
+# 	# print(ITD_score)
+# 	# print(ITS_score)
+# 	# print(ITDITS_scores)
+# 	database.itdits(ITDITS_scores, data[0])
